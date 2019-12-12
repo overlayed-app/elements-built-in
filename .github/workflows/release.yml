@@ -1,0 +1,30 @@
+name: Release CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install, test, semantic-release
+        run: |
+          npm ci
+          npm run test
+          npm run semantic-release
+        env:
+          CI: true
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
