@@ -1,0 +1,80 @@
+name: Release CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: configure git for versioning
+        run: |
+          git config --global user.name overlayed-app-bot
+          git config --global user.email bot@overlayed.app
+          git config --global credential.helper store
+          echo https://overlayed-app-bot:${{ secrets.GITHUB_TOKEN }}@github.com > ~/.git-credentials
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install
+        run: npm ci
+      - name: npm test
+        run: npm run test
+      # note this will be _wrong_ until we configure a detatched head with the current version tagged at the diverged commit
+      - name: find next version
+        id: next_semver
+        uses: bengreenier-actions/gh-release-next-semver@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          use_tag_name: true
+          strip_tag_prefix: 'v'
+          type: 'auto'
+      - name: npm version
+        run: npm version --no-git-tag-version ${{ steps.next_semver.outputs.type }}
+      - name: npm build
+        run: npm run build
+      - name: update changelog
+        run: |
+          npx conventional-changelog-cli -p angular -i CHANGELOG.md -o LATEST_CL.md
+          npx conventional-changelog-cli -p angular -i CHANGELOG.md -s
+          cat LATEST_CL.md
+      - name: read latest changes
+        id: latest_changes
+        uses: bengreenier-actions/shell-with-output@master
+        with:
+          command: cat LATEST_CL.md
+      - name: create release files
+        run: |
+          # mainline
+          git checkout master
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore(release): v${{ steps.next_semver.outputs.next }}"
+          git push origin master
+      - name: create tag files
+        run: |
+          # tag
+          git add --force dist/
+          git commit -m "chore(release): v${{ steps.next_semver.outputs.next }} assets"
+          git tag v${{ steps.next_semver.outputs.next }}
+          git push origin v${{ steps.next_semver.outputs.next }}
+      - name: create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.next_semver.outputs.next }}
+          release_name: Release v${{ steps.next_semver.outputs.next }}
+          draft: false
+          prerelease: false
+          body: ${{ steps.latest_changes.outputs.stdout }}
+      - name: cleanup git creds
+        run: rm ~/.git-credentials
