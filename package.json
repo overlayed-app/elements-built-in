@@ -1,0 +1,57 @@
+{
+  "name": "elements-built-in",
+  "version": "0.0.0-development",
+  "description": "Overlayed2 built-in elements",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "jest --coverage",
+    "lint": "eslint .",
+    "semantic-release": "npm run build && semantic-release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/overlayed-app/elements-built-in.git"
+  },
+  "keywords": [
+    "overlayed",
+    "overlayed-element"
+  ],
+  "author": "Ben Greenier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/overlayed-app/elements-built-in/issues"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  },
+  "homepage": "https://github.com/overlayed-app/elements-built-in#readme",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^2.0.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.3",
+    "@types/jest": "^24.0.23",
+    "@types/react": "^16.9.16",
+    "@types/react-dom": "^16.9.4",
+    "@types/semver": "^6.2.0",
+    "@typescript-eslint/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/parser": "^2.11.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-react": "^7.17.0",
+    "jest": "^24.9.0",
+    "prettier": "^1.19.1",
+    "react-dom": "^16.12.0",
+    "rollup": "^1.27.11",
+    "rollup-plugin-babel-minify": "^9.1.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "semantic-release": "^15.13.31",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.3"
+  },
+  "dependencies": {
+    "react": "^16.12.0",
+    "semver": "^6.3.0"
+  }
+}
