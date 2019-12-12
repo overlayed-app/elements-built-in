@@ -14,7 +14,6 @@ const reactProxy = new Proxy(
   {},
   {
     get: function(_: any, prop) {
-      console.log(prop)
       if (prop === '__sideloadFrom') {
         return __sideloadFrom
       } else {

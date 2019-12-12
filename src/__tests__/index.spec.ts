@@ -15,7 +15,6 @@ describe('injectableElement', () => {
   })
 
   it('fails when react is unshimmed', () => {
-    console.log((React as any).__sideloadFrom)
     const injectorFn = injectableElement({} as any)
 
     expect(() => {
