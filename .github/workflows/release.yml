@@ -22,10 +22,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: npm install
         run: npm ci
-      - name: npm build, test
-        run: |
-          npm run build
-          npm run test
+      - name: npm test
+        run: npm run test
       # note this will be _wrong_ until we configure a detatched head with the current version tagged at the diverged commit
       - name: find next version
         id: next_semver
@@ -36,8 +34,9 @@ jobs:
           strip_tag_prefix: "v"
           type: "auto"
       - name: npm version
-        run: |
-          npm version ${{ steps.next_semver.outputs.type }}
+        run: npm version --no-git-tag-version ${{ steps.next_semver.outputs.type }}
+      - name: npm test
+        run: npm run test
       - name: configure git for versioning
         run: |
           git config --global user.name overlayed-app-bot
