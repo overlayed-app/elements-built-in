@@ -20,13 +20,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, build, test
+      - name: npm install
+        run: npm ci
+      - name: npm build, test
         run: |
-          npm ci
           npm run build
           npm run test
-        env:
-          CI: true
       # note this will be _wrong_ until we configure a detatched head with the current version tagged at the diverged commit
       - name: find next version
         id: next_semver
