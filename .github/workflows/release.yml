@@ -20,11 +20,38 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, test, semantic-release
+      - name: npm install, build, test
         run: |
           npm ci
+          npm run build
           npm run test
-          npm run semantic-release
         env:
           CI: true
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: find next version
+        id: next_semver
+        uses: bengreenier-actions/gh-release-next-semver@master
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          use_tag_name: true
+          strip_tag_prefix: "v"
+          type: "auto"
+      - name: configure git for versioning
+        run: |
+          git config user.name overlayed-app-bot
+          git config user.email bot@overlayed.app
+          git config --global credential.helper store
+          echo overlayed-app-bot:${{ secrets.GH_TOKEN }}@github.com > ~/.git-credentials
+      - name: create tag
+        run: |
+          git add --force dist/
+          git tag v${{ steps.next_semver.outputs.next }}
+          git push origin v${{ steps.next_semver.outputs.next }}
+      - name: create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: v${{ steps.next_semver.outputs.next }}
+          release_name: Release v${{ steps.next_semver.outputs.next }}
+          draft: false
+          prerelease: false
