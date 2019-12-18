@@ -27,6 +27,7 @@ jobs:
           npm run test
         env:
           CI: true
+      # note this will be _wrong_ until we configure a detatched head with the current version tagged at the diverged commit
       - name: find next version
         id: next_semver
         uses: bengreenier-actions/gh-release-next-semver@master
@@ -44,6 +45,7 @@ jobs:
       - name: create tag
         run: |
           git add --force dist/
+          git commit -m "Release v${{ steps.next_semver.outputs.next }} [skip ci]"
           git tag v${{ steps.next_semver.outputs.next }}
           git push origin v${{ steps.next_semver.outputs.next }}
       - name: create release
