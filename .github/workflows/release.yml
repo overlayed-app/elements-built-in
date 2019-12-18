@@ -37,10 +37,10 @@ jobs:
           type: "auto"
       - name: configure git for versioning
         run: |
-          git config user.name overlayed-app-bot
-          git config user.email bot@overlayed.app
+          git config --global user.name overlayed-app-bot
+          git config --global user.email bot@overlayed.app
           git config --global credential.helper store
-          echo overlayed-app-bot:${{ secrets.GH_TOKEN }}@github.com > ~/.git-credentials
+          echo https://overlayed-app-bot:${{ secrets.GH_TOKEN }}@github.com > ~/.git-credentials
       - name: create tag
         run: |
           git add --force dist/
