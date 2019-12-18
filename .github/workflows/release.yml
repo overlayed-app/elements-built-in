@@ -48,7 +48,7 @@ jobs:
           # mainline
           git add package.json package-lock.json
           git commit -m "chore(release): v${{ steps.next_semver.outputs.next }} [skip ci]"
-          git push origin master
+          git push origin origin/master
           # tag
           git add --force dist/
           git commit -m "chore(release): v${{ steps.next_semver.outputs.next }} assets [skip ci]"
