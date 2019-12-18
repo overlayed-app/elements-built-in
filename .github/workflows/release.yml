@@ -35,6 +35,9 @@ jobs:
           use_tag_name: true
           strip_tag_prefix: "v"
           type: "auto"
+      - name: npm version
+        run: |
+          npm version ${{ steps.next_semver.outputs.type }}
       - name: configure git for versioning
         run: |
           git config --global user.name overlayed-app-bot
@@ -43,8 +46,13 @@ jobs:
           echo https://overlayed-app-bot:${{ secrets.GH_TOKEN }}@github.com > ~/.git-credentials
       - name: create tag
         run: |
+          # mainline
+          git add package.json package-lock.json
+          git commit -m "chore(release): v${{ steps.next_semver.outputs.next }} [skip ci]"
+          git push origin master
+          # tag
           git add --force dist/
-          git commit -m "Release v${{ steps.next_semver.outputs.next }} [skip ci]"
+          git commit -m "chore(release): v${{ steps.next_semver.outputs.next }} assets [skip ci]"
           git tag v${{ steps.next_semver.outputs.next }}
           git push origin v${{ steps.next_semver.outputs.next }}
       - name: create release
